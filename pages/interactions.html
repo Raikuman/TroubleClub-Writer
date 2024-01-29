@@ -5,35 +5,19 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Trouble Club Writer - Interactions</title>
-    <link href="../favicon.ico" rel="icon" type="image/x-icon">
-    <link href="../tailslim.css" rel="stylesheet">
+    <link href="/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="/tailslim.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+    <script src="/libraries/jquery-3.7.1.min.js"></script>
 </head>
 <body>
 <main>
-    <nav class="bg-gray-950">
-        <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-            <div class="relative flex h-16 items-center justify-between">
-                <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                    <a href="../index.html" class="flex flex-shrink-0 items-center">
-                        <img class="h-12 w-auto" src="../images/thread.svg" alt="TC Writer">
-                    </a>
-                    <div class="hidden sm:ml-6 sm:block">
-                        <div class="flex space-x-4">
-                            <a href="conversations.html" class="text-gray-300 hover:bg-gray-800 rounded-full px-3 py-2 text-lg font-medium">Conversations</a>
-                            <a href="" class="text-gray-800 bg-gray-300 rounded-full px-3 py-2 text-lg font-medium">Interactions</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="sm:hidden" id="mobile-menu">
-            <div class="space-y-1 px-2 pb-3 pt-2">
-                <a href="conversations.html" class="text-gray-300 hover:bg-gray-800 block rounded-full px-3 py-2 text-base font-medium text-center">Conversations</a>
-                <a href="" class="text-gray-800 bg-gray-300 block rounded-full px-3 py-2 text-base font-medium text-center">Interactions</a>
-            </div>
-        </div>
-    </nav>
+    <div id="navbar"></div>
 </main>
+<script>
+    $.get("/components/navbar.html", function(data){
+        $("#navbar").replaceWith(data);
+    });
+</script>
 </body>
 </html>
