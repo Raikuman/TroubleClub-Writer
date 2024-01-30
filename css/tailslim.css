@@ -581,16 +581,12 @@ video {
   height: 4rem;
 }
 
-.w-auto {
-  width: auto;
-}
-
-.w-16 {
-  width: 4rem;
-}
-
 .w-60 {
   width: 15rem;
+}
+
+.w-auto {
+  width: auto;
 }
 
 .max-w-7xl {
