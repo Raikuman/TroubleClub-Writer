@@ -1,23 +1,142 @@
-function newLine() {
-    $.get("../components/line.html", function (response) {
-        const lineObj = jQuery.parseHTML(response);
-        $("#lines-list").append(lineObj);
+const lineTemplate = {
+    actor: "",
+    targetChannel: "",
+    sticker: "",
+    reaction: "",
+    typeSpeed: 1.0,
+    readSpeed: 1.0,
+    line: ""
+};
+
+function newLine(onclickDelete) {
+    $.get("../components/line.html", function(lineResponse) {
+        // Get line object
+        let lineObj = $(lineResponse);
+        lineObj = setupLineObj(lineObj, onclickDelete);
+        $("#lines-list").append(lineObj)
     });
 }
 
-function loadDialogue() {
-    $("#dialogue").load("../components/dialogue.html", function () {
+function loadDialoguePane(onclickFunction, lines, onclickDelete) {
+    // Remove lines if dialogue is already loaded
+    let lineList = $("#lines-list");
+    if (lineList.length) {
+        lineList.empty();
+
+        for (let i = 0; i < lines.length; i++) {
+            loadLine(lines[i], lineList, onclickDelete);
+        }
+        return;
+    }
+
+    $.get("../components/dialogue.html", function (dialogueResponse) {
+        // Get dialogue object
+        let dialogueObj = $(dialogueResponse);
+
+        // Update new line button to target function
+        dialogueObj.find("#add-new-line").attr("onclick", onclickFunction);
+
+        // Append dialogue to location
+        $("#dialogue").append(dialogueObj);
+
         // Make dialogue sortable
-        $("#lines-list").sortable({
+        const lineList = $("#lines-list");
+        lineList.sortable({
             tolerance: 'pointer'
         })
+
+        // Update dialogue with lines
+        for (let i = 0; i < lines.length; i++) {
+            loadLine(lines[i], lineList, onclickDelete)
+        }
     });
 }
 
-function loadNew(data) {
+function saveLinesToObj(obj) {
+    const lineList = $("#lines-list");
 
+    // Retrieve lines from dialogue
+    lineList.children().each(function (iterator) {
+        let lineObj = $(this);
+        let currentLine = obj.lines[iterator];
+
+        // Retrieve actor
+        let actor = lineObj.find("#actor").val();
+        if (actor === undefined) {
+            return;
+        }
+        currentLine.actor = actor;
+
+        // Retrieve target channel
+        currentLine.targetChannel = lineObj.find("#custom-channel").val();
+
+        // Retrieve sticker
+        currentLine.sticker = lineObj.find("#sticker").val();
+
+        // Retrieve reaction
+        currentLine.reaction = lineObj.find("#reaction").val();
+
+        // Retrieve type speed
+        currentLine.typeSpeed = lineObj.find("#type-speed").val();
+
+        // Retrieve read speed
+        currentLine.readSpeed = lineObj.find("#read-speed").val();
+
+        // Retrieve line
+        currentLine.line = lineObj.find("#line").val();
+
+        iterator++;
+    });
 }
 
-function loadExisting(data) {
+function loadLine(line, lineList, onclickDelete) {
+    $.get("../components/line.html").done(function(lineResponse) {
+        // Get line object
+        let lineObj = $(lineResponse);
 
+        for (let i = 0; i < lineList.length; i++) {
+            let currentLine = lineObj.clone();
+
+            // Setup input
+            currentLine = setupLineObj(lineObj, onclickDelete);
+
+            // Handle data
+            currentLine.find("#actor").val(line.actor);
+            currentLine.find("#custom-channel").val(line.targetChannel);
+            currentLine.find("#sticker").val(line.sticker);
+            currentLine.find("#reaction").val(line.reaction);
+            currentLine.find("#type-speed").val(line.typeSpeed);
+            currentLine.find("#read-speed").val(line.readSpeed);
+            currentLine.find("#line").val(line.line);
+
+            lineList.append(currentLine);
+        }
+    })
+}
+
+function setupLineObj(lineObj, onclickDelete) {
+    // Setup input
+    lineObj.find("#type-speed").on("keydown", function(event) {
+        event.preventDefault();
+    });
+
+    lineObj.find("#read-speed").on("keydown", function(event) {
+        event.preventDefault();
+    });
+
+    lineObj.find("#custom-channel").on("keypress", function(event) {
+        if (event.which < 48 || event.which > 58) {
+            event.preventDefault();
+        }
+    });
+
+    lineObj.find("#custom-channel").on("paste", function(event) {
+        if (event.originalEvent.clipboardData.getData("Text").match(/[^\d]/)) {
+            event.preventDefault();
+        }
+    });
+
+    lineObj.find("#delete").attr("onclick", onclickDelete);
+
+    return lineObj;
 }

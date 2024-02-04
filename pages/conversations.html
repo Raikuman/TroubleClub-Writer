@@ -12,6 +12,7 @@
     <script src="../libraries/jquery-ui-1.13.2.min.js"></script>
     <script src="../scripts/dialogue.js"></script>
     <script src="../scripts/filepicker.js"></script>
+    <script src="../scripts/toast.js"></script>
 </head>
 <body style="background-color: #000714">
 <main>
@@ -53,15 +54,7 @@
                             <h1 class="text-tc-red text-2xl">Conversation</h1>
                         </div>
 
-
-
-
-                        <div id="conversation-settings" class="p-5">
-
-                        </div>
-
-
-
+                        <div id="conversation-settings" class="p-5"></div>
 
                         <div id="dialogue" class="p-5"></div>
                     </div>
@@ -70,6 +63,7 @@
             <br>
         </div>
     </div>
+    <div id="toast" class="fixed inset-x-0 select-none mx-auto text-center -bottom-11 w-52 bg-tc-black text-tc-white p-2 rounded-2 border-2 border-tc-red border-solid"></div>
 </main>
 <script src="../scripts/conversation.js"></script>
 </body>

@@ -7,9 +7,9 @@
         <div class="grid grid-cols-3 gap-x-1">
             <div id="sticker-selector" class="col-span-1">
                 <label for="sticker">Sticker</label>
-                <select id="sticker" name="sticker-1" class="px-2 py-1 text-tc-black block w-full border border-tc-red text-sm rounded-lg focus:ring-tc-blue focus:border-tc-blue dark:bg-tc-white">
-                    <option disabled selected value>- sticker -</option>
-                    <option value="<3>"><3</option>
+                <select id="sticker" name="sticker" class="px-2 py-1 text-tc-black block w-full border border-tc-red text-sm rounded-lg focus:ring-tc-blue focus:border-tc-blue dark:bg-tc-white">
+                    <option disabled selected value="">- sticker -</option>
+                    <option value="<3"><3</option>
                     <option value="suugoi">suugoi</option>
                     <option value="clap">clap</option>
                     <option value="wat">wat</option>
@@ -52,6 +52,8 @@
         <textarea id="line" placeholder="actor line" class="w-full h-16 px-2 py-1 text-tc-black border border-tc-red text-sm rounded-lg focus:ring-tc-blue focus:border-tc-blue dark:bg-tc-white"></textarea>
     </div>
     <div id="delete-line" class="flex col-span-1">
-        <img id="delete" class="max-h-8 max-w-8 cursor-pointer m-auto " src="../images/trash.svg" alt="Delete">
+        <button id="delete" class="max-h-8 max-w-8 cursor-pointer m-auto">
+            <img src="../images/trash.svg" alt="Delete">
+        </button>
     </div>
 </li>
