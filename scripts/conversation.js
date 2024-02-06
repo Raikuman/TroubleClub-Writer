@@ -32,7 +32,7 @@ function addNewFile() {
             settingNameInput.val(currentName);
 
             // Create conversation object
-            let conversation = { ...conversationTemplate }
+            let conversation = structuredClone(conversationTemplate);
             conversation.fileName = currentName;
 
             // Set file input field as name

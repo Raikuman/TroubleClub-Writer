@@ -8,6 +8,11 @@ const lineTemplate = {
     line: ""
 };
 
+const dialogueTemplate = {
+    chance: 100,
+    lines: []
+}
+
 function newLine(onclickDelete) {
     $.get("../components/line.html", function(lineResponse) {
         // Get line object
@@ -139,4 +144,100 @@ function setupLineObj(lineObj, onclickDelete) {
     lineObj.find("#delete").attr("onclick", onclickDelete);
 
     return lineObj;
+}
+
+function addNewLine(lineObj, lineList, data, saveFunction) {
+    // Setup inputs
+    lineObj.find("#type-speed").on("keydown", function(event) {
+        event.preventDefault();
+    }).on("click", function() {
+        data.typeSpeed = $(this).val();
+        saveFunction();
+    });
+
+    lineObj.find("#read-speed").on("keydown", function(event) {
+        event.preventDefault();
+    }).on("click", function() {
+        data.readSpeed = $(this).val();
+        saveFunction();
+    });
+
+    lineObj.find("#custom-channel").on("keypress", function(event) {
+        if (event.which === 13) {
+            data.targetChannel = $(this).val();
+            $(this).trigger("blur");
+            saveFunction();
+        }
+
+        if (event.which < 48 || event.which > 58) {
+            event.preventDefault();
+        }
+    }).on("paste", function(event) {
+        if (event.originalEvent.clipboardData.getData("Text").match(/[^\d]/)) {
+            event.preventDefault();
+        }
+    }).on("focusout", function() {
+        data.targetChannel = $(this).val();
+        saveFunction();
+    })
+
+    lineObj.find("#sticker").on("focusout", function() {
+        data.sticker = $(this).val();
+        saveFunction();
+    }).on("change", function() {
+        data.sticker = $(this).val();
+        saveFunction();
+    });
+
+    lineObj.find("#reaction").on("focusout", function() {
+        data.reaction = $(this).val();
+        saveFunction();
+    }).on("keypress", function(event) {
+        if (event.which === 13) {
+            data.reaction = $(this).val();
+            saveFunction();
+            $(this).trigger("blur");
+        }
+    });
+
+    lineObj.find("#actor").on("focusout", function() {
+        data.actor = $(this).val();
+        saveFunction();
+    }).on("change", function() {
+        data.actor = $(this).val();
+        saveFunction();
+    });
+
+    lineObj.find("#line").on("focusout", function() {
+        data.line = $(this).val();
+        saveFunction();
+    }).on("keypress", function(event) {
+        if (event.which === 13) {
+            data.targetChannel = $(this).val();
+            saveFunction();
+            $(this).trigger("blur");
+        }
+    });
+
+    lineObj.find("#delete").on("click", deleteLine);
+
+    // Handle data
+    if (data === undefined) {
+        lineList.append(lineObj);
+        return;
+    }
+
+    lineObj.find("#actor").val(data.actor);
+    lineObj.find("#custom-channel").val(data.targetChannel);
+    lineObj.find("#sticker").val(data.sticker);
+    lineObj.find("#reaction").val(data.reaction);
+    lineObj.find("#type-speed").val(data.typeSpeed);
+    lineObj.find("#read-speed").val(data.readSpeed);
+    lineObj.find("#line").val(data.line);
+
+    lineList.append(lineObj);
+}
+
+function deleteLine() {
+
 }
