@@ -1,0 +1,28 @@
+<h2 class="text-tc-blue text-xl pb-1">Settings</h2>
+<div class="border-2 border-tc-blue border-solid p-5 grid grid-cols-2 gap-4">
+    <div class="col-span-1">
+        <div class="flex">
+            <label for="file-name" class="w-28">File Name: </label>
+            <input id="file-name" placeholder="file name" class="px-2 py-1 text-tc-black border border-tc-red text-sm rounded-lg focus:ring-tc-blue focus:border-tc-blue dark:bg-tc-white w-full">
+        </div>
+        <br>
+        <div class="flex">
+            <div class="w-1/2 h-32 overflow-y-auto border-2 border-tc-blue bg-tc-purple border-solid">
+                <table id="words-table" class="p-5 w-full"></table>
+            </div>
+            <div class="w-1/2 mx-auto px-2">
+                <label for="words-input">Add Word:</label>
+                <input id="words-input" class="px-2 py-1 text-tc-black border border-tc-red text-sm rounded-lg focus:ring-tc-blue focus:border-tc-blue dark:bg-tc-white w-full">
+                <button id="add-word" class="hover:bg-tc-purple rounded-2 bg-tc-blue px-5 mt-1 w-full">Add Word</button>
+                <div class="flex my-2">
+                    <label for="req-words" class="w-20">Req. Words:</label>
+                    <input id="req-words" type="number" min="0" step="1" value="1" required class="w-5/12 text-tc-black border border-tc-red text-sm rounded-lg focus:ring-tc-blue focus:border-tc-blue dark:bg-tc-white">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-span-1">
+        <button onclick="deleteInteraction()" class="hover:bg-tc-purple rounded-2 bg-tc-red px-5 py-0.5 w-full h-14 m-1">Delete File</button>
+        <button onclick="saveInteractions()" class="hover:bg-tc-purple rounded-2 bg-tc-blue px-5 py-0.5 w-full h-14 m-1">Save File</button>
+    </div>
+</div>

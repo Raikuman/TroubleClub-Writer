@@ -8,6 +8,11 @@
     <link href="../images/favicon.ico" rel="icon" type="image/x-icon">
     <link href="../css/tailslim.css" rel="stylesheet">
     <link href="../css/styles.css" rel="stylesheet">
+    <script src="../libraries/jquery-3.7.1.min.js"></script>
+    <script src="../libraries/jquery-ui-1.13.2.min.js"></script>
+    <script src="../scripts/dialogue.js"></script>
+    <script src="../scripts/filepicker.js"></script>
+    <script src="../scripts/toast.js"></script>
 </head>
 <body style="background-color: #000714">
 <main>
@@ -40,8 +45,26 @@
         <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 border-2 border-tc-red border-solid text-tc-white text-center">
             <br>
             <h1 class="text-tc-blue text-4xl font-bold">Interactions</h1>
+            <br>
+            <div id="interactions-col" class="grid grid-cols-12 gap-x-8">
+                <div id="file-picker" class="col-span-12 lg:col-span-3"></div>
+                <div id="interactions-writer" class="col-span-12 lg:col-span-9">
+                    <div class="bg-tc-night rounded-2">
+                        <div class="p-5">
+                            <h1 class="text-tc-red text-2xl">Interactions</h1>
+                        </div>
+
+                        <div id="interaction-settings" class="p-5"></div>
+
+                        <div id="dialogues" class="p-5"></div>
+                    </div>
+                </div>
+            </div>
+            <br>
         </div>
     </div>
+    <div id="toast" class="fixed inset-x-0 select-none mx-auto text-center -bottom-11 w-52 bg-tc-black text-tc-white p-2 rounded-2 border-2 border-tc-red border-solid"></div>
 </main>
+<script src="../scripts/interactions.js"></script>
 </body>
 </html>
