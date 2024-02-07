@@ -403,3 +403,36 @@ function instantiateInteractionLine() {
         saveInteractions();
     });
 }
+
+function forceSaveInteractions() {
+    // Retrieve data from settings
+    currentInteraction.fileName = $("#file-name").val();
+    currentInteraction.reqWords = $("#req-words").val();
+    currentInteraction.words = [];
+    $("#words-table").children().each(function() {
+        currentInteraction.words.push($(this).find("#word").text());
+    });
+
+    // Retrieve data from dialogues
+    $("#dialogues").children().forEach(function(dialogueIterator) {
+        const dialogue = $(this);
+        const dialogueData = currentInteraction.dialogues[dialogueIterator];
+        dialogueData.chance = dialogue.find("#dialogue-chance").val();
+
+        // Retrieve data from lines
+        dialogue.find("#lines-list").children().each(function(lineIterator) {
+            const line = $(this);
+            const lineData = dialogueData.lines[lineIterator];
+
+            lineData.sticker = line.find("#sticker").val();
+            lineData.reaction = line.find("#reaction").val();
+            lineData.actor = line.find("#actor").val();
+            lineData.targetChannel = line.find("#custom-channel").val();
+            lineData.typeSpeed = line.find("#type-speed").val();
+            lineData.readSpeed = line.find("#read-speed").val();
+            lineData.line = line.find("#line").val();
+        });
+    });
+
+    saveInteractions();
+}
