@@ -1,6 +1,5 @@
-let currentFile = null;
 let currentConversation = null;
-let conversationList = [];
+let conversations = [];
 
 const conversationTemplate = {
     fileName: "",
@@ -10,211 +9,266 @@ const conversationTemplate = {
 const conversationWriterDiv = $("#conversation-writer");
 conversationWriterDiv.hide();
 
-function addNewFile() {
-    conversationWriterDiv.show();
+loadConversationData();
 
-    $.get("../components/file.html", function (fileResponse) {
-        $("#conversation-settings").load("../components/conversationSettings.html", function(settingResponse) {
+function loadConversationData() {
+    $("#file-picker").load("../components/filePicker.html", function() {
+        // Load conversations into array
+        conversations = JSON.parse(localStorage.getItem("conversations"));
+
+        // If conversations could not be parsed, use an empty array
+        if (conversations === null) {
+            conversations = [];
+        }
+
+        // Load file.html component and populate the file list
+        $.get("../components/file.html").done(function (fileResponse) {
             const fileObj = $(fileResponse);
-            const settingObj = $(this);
-            const settingNameInput = settingObj.find("#file-name");
-            const fileName = fileObj.find("#file-name");
-            const fileList = $("#files");
-
-            currentFile = fileObj;
-            let currentName = "File-" + fileList.children().length;
-
-            // Add file to list
-            addFile(fileObj, "conversationLoadFromFile(this)", "");
-            fileName.text(currentName);
-
-            // Update file name in settings
-            settingNameInput.val(currentName);
-
-            // Create conversation object
-            let conversation = structuredClone(conversationTemplate);
-            conversation.fileName = currentName;
-
-            // Set file input field as name
-            settingNameInput.on("keyup", function(event) {
-                renameConversationFile($(this), event);
-            })
-
-            // Handle data
-            conversationList.push(conversation);
-
-            // Save current
-            if (fileList.children().length > 2) {
-                saveConversations();
+            for (let i = 0; i < conversations.length; i++) {
+                addFile(fileObj.clone(), loadConversationFromFile, conversations[i].fileName);
             }
-
-            currentConversation = conversation;
-
-            // Load dialogue pane
-            loadDialoguePane("conversationNewLine()", currentConversation.lines, "conversationDeleteLine(this)");
         });
     });
 }
 
-function loadConversations() {
-    conversationList = JSON.parse(localStorage.getItem("conversations"));
-    if (conversationList === null) {
-        conversationList = [];
-    }
+function addNewFile() {
+    // Ensure writer div is shown
+    conversationWriterDiv.show();
 
-    $.get("../components/file.html").done(function(fileResponse) {
+    // Create new file object
+    $.get("../components/file.html", function(fileResponse) {
         const fileObj = $(fileResponse);
 
-        for (let i = 0; i < conversationList.length; i++) {
-            addFile(fileObj.clone(), "conversationLoadFromFile(this)", conversationList[i].fileName);
-        }
+        // Create file in file list;
+        const fileName = "File-" + $("#files").children().length;
+        addFile(fileObj, loadConversationFromFile, fileName);
+
+        // Construct new conversation
+        const newConversation = structuredClone(conversationTemplate);
+        newConversation.fileName = fileName;
+
+        // Handle state
+        currentConversation = newConversation;
+        conversations.push(currentConversation);
+
+        // Instantiate conversation if not existing
+        instantiateConversation(currentConversation);
+
+        saveConversations()
     });
 }
 
-$("#file-picker").load("../components/filePicker.html", function() {
-    loadConversations();
-});
-
-function conversationNewLine() {
-    newLine("conversationDeleteLine(this)");
-    currentConversation.lines.push({ ...lineTemplate });
-    saveConversations();
-}
-
-function conversationDeleteLine(line) {
-    if (currentConversation === null || currentFile === null) {
-        showToast("Unable to delete line")
-        return;
-    }
-
-    const lineList = $("#lines-list");
-    const lineObj = $(line).parent().parent();
-    const lineIndex = lineList.children().index(lineObj);
-
-    if (!confirm("Are you sure you want to delete line #" + (lineIndex + 1))) {
-        return;
-    }
-
-    // Delete data
-    if (lineIndex > -1) {
-        currentConversation.lines.splice(lineIndex, 1);
-    } else {
-        showToast("Unable to delete line")
-        return;
-    }
-
-    // Remove line
-    lineObj.remove();
-
-    showToast("Deleted line #" + (lineIndex + 1))
-    saveConversations();
-}
-
-function saveConversations() {
-    saveLinesToObj(currentConversation);
-
-    // Stringify conversation list & update local storage
-    localStorage.setItem("conversations", JSON.stringify(conversationList));
-
-    showToast("Saved conversations");
-}
-
-function conversationLoadFromFile(radio) {
-    // Set current file & conversation
-    currentFile = $(radio).parent();
-    if (currentFile !== null && currentFile.find("#file-name").text() !== radio.value) {
-        return;
-    }
-
+function loadConversationFromFile() {
     conversationWriterDiv.show();
-    saveConversations();
+    // Get value from radio
+    const value = $(this).val();
 
-    for (let i = 0; i < conversationList.length; i++) {
-        if (conversationList[i].fileName === radio.value) {
-            currentConversation = conversationList[i];
+    // Get conversation from array using file name
+    let foundConversation = null;
+    for (let i = 0; i < conversations.length; i++) {
+        if (conversations[i].fileName === value) {
+            foundConversation = conversations[i];
             break;
         }
     }
 
-
-    // Update information
-    let convSettings = $("#conversation-settings");
-    if (convSettings.children()) {
-        // Load settings
-        convSettings.load("../components/conversationSettings.html", function() {
-            loadConversationSettings($(this), radio);
-        });
-    }
-
-    let dialogue = $("#dialogue");
-    if (dialogue.children()) {
-        // Load dialogue
-        loadDialoguePane("conversationNewLine()", currentConversation.lines, "conversationDeleteLine(this)");
-    }
-}
-
-function loadConversationSettings(settingObj, radio) {
-    const input = settingObj.find("#file-name");
-    input.val(radio.value);
-
-    // Set file input field as name
-    input.on("keyup", function(event) {
-        renameConversationFile($(this), event);
-    });
-}
-
-function renameConversationFile(inputObj, event) {
-    const eventKey = event.key;
-    if (eventKey === " " || eventKey === "Tab" || eventKey === "Enter") {
-        event.preventDefault();
+    // Check found conversation and set current conversation
+    if (foundConversation == null) {
         return;
-    }
-    let inputText = inputObj.val()
-
-    let finalName;
-    if (!inputText) {
-        // Set default file name
-        finalName = "File-" + $("#files").children().index(currentFile);
     } else {
-        // Set name from input
-        finalName = inputText;
+        currentConversation = foundConversation;
     }
 
-    // Update name from file picker
-    currentFile.find("#file-name").text(finalName);
-
-    // Update radio value
-    currentFile.find("#file-radio")[0].value = finalName;
-
-    // Update name in data
-    currentConversation.fileName = finalName;
+    // Load conversation to screen
+    $("#lines-list").empty();
+    instantiateConversation(currentConversation);
 }
 
 function deleteConversation() {
-    if (currentConversation === null || currentFile === null) {
-        showToast("Unable to delete conversation")
-        return;
-    }
-    const fileName = currentFile.find("#file-name").text();
+    // Save file name to delete file in file picker
+    const fileName = currentConversation.fileName;
 
-    if (!confirm("Are you sure you want to delete conversation: " + fileName)) {
+    if (!confirm("Do you want to delete " + fileName + "?")) {
         return;
     }
 
-    // Delete data
-    const index = conversationList.indexOf(currentConversation);
+    // Remove current conversation from data
+    const index = conversations.indexOf(currentConversation);
     if (index > -1) {
-        conversationList.splice(index, 1);
+        conversations.splice(index, 1);
+        saveConversations();
     } else {
-        showToast("Unable to delete conversation")
+        showToast("Unable to delete conversation");
         return;
     }
 
-    // Delete components
-    currentFile.remove();
-    $("#conversation-settings").empty();
-    $("#dialogue").empty();
+    // Find and delete the file object
+    const files = $("#files").children();
+    for (let i = 0; i < files.length; i++) {
+        let currentFile = files.eq(i);
 
-    showToast("Deleted conversation " + fileName)
+        // Check if child has the file id
+        if (currentFile.is("#file")) {
+            // Check if file name matches the deletion name
+            if (currentFile.find("#file-name").text() === fileName) {
+                currentFile.remove();
+                break;
+            }
+        }
+    }
+
+    // Hide div
+    conversationWriterDiv.hide();
+
+}
+
+function saveConversations() {
+    // Stringify conversations & update local storage
+    localStorage.setItem("conversations", JSON.stringify(conversations));
+
+    showToast("Saved conversations");
+}
+
+function instantiateConversation(data) {
+    // Handle conversation object
+    const conversationSettings = $("#conversation-settings");
+    if (conversationSettings.children().length === 0) {
+        conversationSettings.load("../components/conversationSettings.html", function() {
+            // Load conversation settings data
+            loadConversationSettings($(this));
+            loadConversationSettingsData($(this), data);
+        });
+    } else {
+        loadConversationSettingsData(conversationSettings, data);
+    }
+
+    // Handle dialogue object
+    const dialogue = $("#dialogue");
+    if (dialogue.children().length === 0) {
+        dialogue.load("../components/dialogue.html", function(dialogueResponse) {
+            // Setup dialogue new line button
+            $(dialogueResponse).find("#add-new-line").on("click", instantiateConversationLine);
+
+            // Load dialogue data
+            loadConversationDialogue();
+        });
+    } else {
+        loadConversationDialogue();
+    }
+}
+
+function loadConversationSettings(settingObj) {
+    // Update listeners
+    const input = settingObj.find("#file-name");
+    const fileChildren = $("#files").children();
+
+    input.on("focusout", function(event) {
+        // Skip spaces and .
+        if (event.which === 32 || event.which === 46) {
+            event.preventDefault();
+        }
+    }).on("focusout", function() {
+        const input = $(this);
+
+        if (!input.val()) {
+            // Set default file name
+            let finalName = "File-" + (conversations.indexOf(currentConversation) + 1);
+
+            input.val(finalName);
+            fileChildren.eq(conversations.indexOf(currentConversation) + 1).find("#file-name").text(finalName);
+        }
+
+        currentConversation.fileName = input.val();
+        saveConversations();
+    }).on("keyup", function(event) {
+        const input = $(this);
+
+        // Save when pressing enter
+        if (event.which === 13) {
+            if (!input.val()) {
+                // Set default file name
+                let finalName = "File-" + (conversations.indexOf(currentConversation) + 1);
+
+                input.val(finalName);
+                fileChildren.eq(conversations.indexOf(currentConversation) + 1).find("#file-name").text(finalName);
+            }
+
+            input.trigger("blur");
+            saveConversations();
+            return;
+        }
+
+        // Check for correct file naming
+        const inputText = input.val();
+        let finalName = inputText;
+
+        // Update name from input
+        input.val(finalName);
+
+        // Update file obj
+        const fileObj = fileChildren.eq(conversations.indexOf(currentConversation) + 1);
+        if (!inputText) {
+            fileObj.find("#file-name").text(" ");
+        } else {
+            fileObj.find("#file-name").text(finalName);
+        }
+        fileObj.find("#file-radio").val(finalName);
+    });
+}
+
+function loadConversationSettingsData(settingObj, data) {
+    if (data === undefined) {
+        return;
+    }
+    const input = settingObj.find("#file-name");
+
+    // Get file object
+    const fileObj = $("#files").children().eq(conversations.indexOf(currentConversation) + 1);
+
+    // Update file name
+    input.val(currentConversation.fileName);
+    fileObj.find("#file-name").text(currentConversation.fileName);
+    fileObj.find("#file-radio").val(currentConversation.fileName);
+}
+
+function loadConversationDialogue() {
+    // Load lines into dialogue
+    $.get("../components/line.html", function(lineResponse) {
+        const lineObj = $(lineResponse);
+        for (let i = 0; i < currentConversation.lines.length; i++) {
+            addNewLine(lineObj.clone(), $("#lines-list"), currentConversation.lines[i], saveConversations);
+        }
+    });
+}
+
+function instantiateConversationLine() {
+    // Create new line object
+    $.get("../components/line.html", function(lineResponse) {
+        let lineData = structuredClone(lineTemplate);
+        currentConversation.lines.push(lineData);
+        addNewLine($(lineResponse), $("#lines-list"), lineData, saveConversations);
+
+        saveConversations();
+    });
+}
+
+function forceSaveConversations() {
+    // Retrieve data from settings
+    currentConversation.fileName = $("#file-name").val();
+
+    // Retrieve data from dialogue
+    $("#lines-list").children().each(function(lineIterator) {
+        const line = $(this);
+        const lineData = currentConversation.lines[i];
+
+        lineData.sticker = line.find("#sticker").val();
+        lineData.reaction = line.find("#reaction").val();
+        lineData.actor = line.find("#actor").val();
+        lineData.targetChannel = line.find("#custom-channel").val();
+        lineData.typeSpeed = line.find("#type-speed").val();
+        lineData.readSpeed = line.find("#read-speed").val();
+        lineData.line = line.find("#line").val();
+    });
+
     saveConversations();
 }

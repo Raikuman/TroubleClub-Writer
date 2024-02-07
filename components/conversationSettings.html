@@ -1,15 +1,13 @@
 <h2 class="text-tc-blue text-xl pb-1">Settings</h2>
-<div class="border-2 border-tc-blue border-solid p-5">
-    <div class="flex">
-        <div id="file-name-selector" class="block mt-1 w-1/2">
-            <label for="file-name">File Name: </label>
-            <input id="file-name" placeholder="file name" class="px-2 py-1 text-tc-black border border-tc-red text-sm rounded-lg focus:ring-tc-blue focus:border-tc-blue dark:bg-tc-white">
-        </div>
-        <div id="delete-file-selector" class="block mt-1 w-1/2">
-            <button onclick="deleteConversation()" class="hover:bg-tc-purple rounded-2 block bg-tc-red w-full px-5 py-0.5 m-auto">Delete File</button>
+<div class="border-2 border-tc-blue border-solid p-5 grid grid-cols-2 gap-4">
+    <div class="col-span-1">
+        <div class="flex">
+            <label for="file-name" class="w-28">File Name: </label>
+            <input id="file-name" placeholder="file name" class="px-2 py-1 text-tc-black border border-tc-red text-sm rounded-lg focus:ring-tc-blue focus:border-tc-blue dark:bg-tc-white w-full">
         </div>
     </div>
-    <div id="save-file-selector" class="block mt-1 w-full">
-        <button onclick="saveConversations()" class="hover:bg-tc-purple rounded-2 block bg-tc-blue w-full px-5 py-0.5 m-auto">Save File</button>
+    <div class="col-span-1">
+        <button onclick="deleteConversation()" class="hover:bg-tc-purple rounded-2 bg-tc-red px-5 py-0.5 w-full h-14 m-1">Delete File</button>
+        <button onclick="forceSaveConversations()" class="hover:bg-tc-purple rounded-2 bg-tc-blue px-5 py-0.5 w-full h-14 m-1">Save File</button>
     </div>
 </div>

@@ -27,7 +27,7 @@ function loadInteractionData() {
         $.get("../components/file.html").done(function(fileResponse) {
             const fileObj = $(fileResponse);
             for (let i = 0; i < interactions.length; i++) {
-                addFileNew(fileObj.clone(), loadInteractionFromFile, interactions[i].fileName);
+                addFile(fileObj.clone(), loadInteractionFromFile, interactions[i].fileName);
             }
         });
     });
@@ -42,7 +42,8 @@ function addNewFile() {
         const fileObj = $(fileResponse);
 
         // Create file in file list
-        const fileName = handleInteractionFile(fileObj, true);
+        const fileName = "File-" + $("#files").children().length;
+        addFile(fileObj, loadInteractionFromFile, fileName);
 
         // Construct new interaction
         const newInteraction = structuredClone(interactionTemplate);
@@ -85,29 +86,19 @@ function loadInteractionFromFile() {
     instantiateInteraction(currentInteraction);
 }
 
-function handleInteractionFile(fileObj, isCurrent, customName) {
-    const fileList = $("#files");
-
-    // Construct file name
-    let fileName = customName;
-    if (!fileName) {
-        fileName = "File-" + fileList.children().length;
-    }
-
-    // Add file to list
-    addFileNew(fileObj, loadInteractionFromFile, fileName);
-
-    return fileName;
-}
-
 function deleteInteraction() {
     // Save file name to delete file in file picker
     const fileName = currentInteraction.fileName;
+
+    if (!confirm("Do you want to delete " + fileName + "?")) {
+        return;
+    }
 
     // Remove current interaction from data
     const index = interactions.indexOf(currentInteraction);
     if (index > -1) {
         interactions.splice(index, 1);
+        saveInteractions();
     } else {
         showToast("Unable to delete interaction")
         return;
@@ -117,6 +108,7 @@ function deleteInteraction() {
     const files = $("#files").children();
     for (let i = 0; i < files.length; i++) {
         let currentFile = files.eq(i);
+
         // Check if child has the file id
         if (currentFile.is("#file")) {
             // Check if file name matches the deletion name
@@ -129,7 +121,6 @@ function deleteInteraction() {
 
     // Hide div
     interactionWriterDiv.hide();
-    saveInteractions();
 }
 
 function saveInteractions() {
@@ -192,6 +183,21 @@ function loadInteractionSettings(settingObj) {
     }).on("keyup", function(event) {
         const input = $(this);
 
+        // Save when pressing enter
+        if (event.which === 13) {
+            if (!input.val()) {
+                // Set default file name
+                let finalName = "File-" + (interactions.indexOf(currentInteraction) + 1);
+
+                input.val(finalName);
+                fileChildren.eq(interactions.indexOf(currentInteraction) + 1).find("#file-name").text(finalName);
+            }
+
+            input.trigger("blur");
+            saveInteractions();
+            return;
+        }
+
         // Check for correct file naming
         const inputText = input.val();
         let finalName = inputText;
@@ -207,20 +213,6 @@ function loadInteractionSettings(settingObj) {
             fileObj.find("#file-name").text(finalName);
         }
         fileObj.find("#file-radio").val(finalName);
-
-        // Save when pressing enter
-        if (event.which === 13) {
-            if (!input.val()) {
-                // Set default file name
-                let finalName = "File-" + (interactions.indexOf(currentInteraction) + 1);
-
-                input.val(finalName);
-                fileChildren.eq(interactions.indexOf(currentInteraction) + 1).find("#file-name").text(finalName);
-            }
-
-            input.trigger("blur");
-            saveInteractions();
-        }
     });
 
     // Handle adding words
@@ -245,7 +237,6 @@ function loadInteractionSettings(settingObj) {
         currentInteraction.reqWords = $(this).val();
         saveInteractions();
     });
-
 }
 
 function addWordInput(input) {
@@ -390,7 +381,7 @@ function instantiateInteractionLine() {
     const currentDialogue = $(this).parent().parent();
     const dialogueIndex = $(currentDialogue.parent()).children().index(currentDialogue);
     if (dialogueIndex < 0) {
-        showToast("Unable to add interaction")
+        showToast("Unable to add line")
         return;
     }
 
