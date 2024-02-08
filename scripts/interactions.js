@@ -427,3 +427,27 @@ function forceSaveInteractions() {
 
     saveInteractions();
 }
+
+function downloadInteraction(data) {
+    let targetData;
+    if (data === undefined) {
+        targetData = currentInteraction;
+    } else {
+        targetData = data;
+    }
+
+    $("<a />", {
+        "download": targetData.fileName + ".json",
+        "href": "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(targetData)),
+    }).appendTo("body").click(function() { $(this).remove(); })[0].click();
+}
+
+function downloadAllFiles() {
+    if (!confirm("Do you want to download all interactions?")) {
+        return;
+    }
+
+    for (let i = 0; i < interactions.length; i++) {
+        downloadInteraction(interactions[i]);
+    }
+}

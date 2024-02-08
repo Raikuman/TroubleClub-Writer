@@ -257,7 +257,7 @@ function forceSaveConversations() {
     currentConversation.fileName = $("#file-name").val();
 
     // Retrieve data from dialogue
-    $("#lines-list").children().each(function(lineIterator) {
+    $("#lines-list").children().each(function() {
         const line = $(this);
         const lineData = currentConversation.lines[i];
 
@@ -271,4 +271,28 @@ function forceSaveConversations() {
     });
 
     saveConversations();
+}
+
+function downloadConversation(data) {
+    let targetData;
+    if (data === undefined) {
+        targetData = currentConversation;
+    } else {
+        targetData = data;
+    }
+
+    $("<a />", {
+        "download": targetData.fileName + ".json",
+        "href": "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(targetData)),
+    }).appendTo("body").click(function() { $(this).remove(); })[0].click();
+}
+
+function downloadAllFiles() {
+    if (!confirm("Do you want to download all conversations?")) {
+        return;
+    }
+
+    for (let i = 0; i < conversations.length; i++) {
+        downloadConversation(conversations[i]);
+    }
 }
