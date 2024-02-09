@@ -145,9 +145,9 @@ function instantiateConversation(data) {
     // Handle dialogue object
     const dialogue = $("#dialogue");
     if (dialogue.children().length === 0) {
-        dialogue.load("../components/dialogue.html", function(dialogueResponse) {
+        dialogue.load("../components/dialogue.html", function() {
             // Setup dialogue new line button
-            $(dialogueResponse).find("#add-new-line").on("click", instantiateConversationLine);
+            $("#add-new-line").on("click", instantiateConversationLine);
 
             // Load dialogue data
             loadConversationDialogue();
@@ -247,7 +247,6 @@ function instantiateConversationLine() {
         let lineData = structuredClone(lineTemplate);
         currentConversation.lines.push(lineData);
         addNewLine($(lineResponse), $("#lines-list"), lineData, saveConversations);
-
         saveConversations();
     });
 }
