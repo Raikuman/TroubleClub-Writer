@@ -44,53 +44,12 @@ function loadDialoguePane(onclickFunction, lines, onclickDelete) {
         // Append dialogue to location
         $("#dialogue").append(dialogueObj);
 
-        // Make dialogue sortable
-        const lineList = $("#lines-list");
-        lineList.sortable({
-            tolerance: 'pointer'
-        })
+
 
         // Update dialogue with lines
         for (let i = 0; i < lines.length; i++) {
             loadLine(lines[i], lineList, onclickDelete)
         }
-    });
-}
-
-function saveLinesToObj(obj) {
-    const lineList = $("#lines-list");
-
-    // Retrieve lines from dialogue
-    lineList.children().each(function (iterator) {
-        let lineObj = $(this);
-        let currentLine = obj.lines[iterator];
-
-        // Retrieve actor
-        let actor = lineObj.find("#actor").val();
-        if (actor === undefined) {
-            return;
-        }
-        currentLine.actor = actor;
-
-        // Retrieve target channel
-        currentLine.targetChannel = lineObj.find("#custom-channel").val();
-
-        // Retrieve sticker
-        currentLine.sticker = lineObj.find("#sticker").val();
-
-        // Retrieve reaction
-        currentLine.reaction = lineObj.find("#reaction").val();
-
-        // Retrieve type speed
-        currentLine.typeSpeed = lineObj.find("#type-speed").val();
-
-        // Retrieve read speed
-        currentLine.readSpeed = lineObj.find("#read-speed").val();
-
-        // Retrieve line
-        currentLine.line = lineObj.find("#line").val();
-
-        iterator++;
     });
 }
 
@@ -219,8 +178,6 @@ function addNewLine(lineObj, lineList, data, saveFunction) {
         }
     });
 
-    lineObj.find("#delete").on("click", deleteLine);
-
     // Handle data
     if (data === undefined) {
         lineList.append(lineObj);
@@ -236,8 +193,4 @@ function addNewLine(lineObj, lineList, data, saveFunction) {
     lineObj.find("#line").val(data.line);
 
     lineList.append(lineObj);
-}
-
-function deleteLine() {
-
 }

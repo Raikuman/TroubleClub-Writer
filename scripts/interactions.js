@@ -348,6 +348,10 @@ function instantiateInteractionDialogue(data) {
         // Add to dialogue list
         dialogueObj.insertBefore($("#add-new-dialogue"));
 
+        dialogueObj.find("#lines-list").sortable({
+            tolerance: 'pointer'
+        });
+
         // Load lines into dialogue
         $.get("../components/line.html", function(lineResponse) {
             const lineObj = $(lineResponse);

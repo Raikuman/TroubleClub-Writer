@@ -149,6 +149,11 @@ function instantiateConversation(data) {
             // Setup dialogue new line button
             $("#add-new-line").on("click", instantiateConversationLine);
 
+            // Make dialogue sortable
+            $("#lines-list").sortable({
+                tolerance: 'pointer'
+            });
+
             // Load dialogue data
             loadConversationDialogue();
         });
