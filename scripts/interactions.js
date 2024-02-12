@@ -409,7 +409,7 @@ function forceSaveInteractions() {
     });
 
     // Retrieve data from dialogues
-    $("#dialogues").children().forEach(function(dialogueIterator) {
+    $("#dialogues").children().each(function(dialogueIterator) {
         const dialogue = $(this);
         const dialogueData = currentInteraction.dialogues[dialogueIterator];
         dialogueData.chance = dialogue.find("#dialogue-chance").val();
