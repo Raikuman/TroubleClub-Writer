@@ -258,7 +258,7 @@ function instantiateConversationLine() {
 
 function forceSaveConversations() {
     // Retrieve data from settings
-    currentConversation.fileName = $("#file-name").val();
+    currentConversation.fileName = $("#file-name").text();
 
     // Retrieve data from dialogue
     $("#lines-list").children().each(function() {

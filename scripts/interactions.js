@@ -401,7 +401,7 @@ function instantiateInteractionLine() {
 
 function forceSaveInteractions() {
     // Retrieve data from settings
-    currentInteraction.fileName = $("#file-name").val();
+    currentInteraction.fileName = $("#file-name").text();
     currentInteraction.reqWords = $("#req-words").val();
     currentInteraction.words = [];
     $("#words-table").children().each(function() {
