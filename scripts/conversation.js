@@ -119,7 +119,10 @@ function deleteConversation() {
 
     // Hide div
     conversationWriterDiv.hide();
+}
 
+function deleteConversationLine(dataObj) {
+    currentConversation.dialogue.lines.splice(dataObj.index, 1);
 }
 
 function saveConversations() {
@@ -241,7 +244,7 @@ function loadConversationDialogue() {
     $.get("../components/line.html", function(lineResponse) {
         const lineObj = $(lineResponse);
         for (let i = 0; i < currentConversation.dialogue.lines.length; i++) {
-            addNewLine(lineObj.clone(), $("#lines-list"), currentConversation.dialogue.lines[i], saveConversations);
+            addNewLine(lineObj.clone(), $("#lines-list"), currentConversation.dialogue.lines[i], saveConversations, deleteConversationLine);
         }
     });
 }
@@ -251,7 +254,7 @@ function instantiateConversationLine() {
     $.get("../components/line.html", function(lineResponse) {
         let lineData = structuredClone(lineTemplate);
         currentConversation.dialogue.lines.push(lineData);
-        addNewLine($(lineResponse), $("#lines-list"), lineData, saveConversations);
+        addNewLine($(lineResponse), $("#lines-list"), lineData, saveConversations, deleteConversationLine);
         saveConversations();
     });
 }
@@ -261,9 +264,9 @@ function forceSaveConversations() {
     currentConversation.fileName = $("#file-name").text();
 
     // Retrieve data from dialogue
-    $("#lines-list").children().each(function() {
+    $("#lines-list").children().each(function(lineIterator) {
         const line = $(this);
-        const lineData = currentConversation.dialogue.lines[i];
+        const lineData = currentConversation.dialogue.lines[lineIterator];
 
         lineData.sticker = line.find("#sticker").val();
         lineData.reaction = line.find("#reaction").val();

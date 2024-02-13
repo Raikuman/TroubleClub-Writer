@@ -13,99 +13,7 @@ const dialogueTemplate = {
     lines: []
 }
 
-function newLine(onclickDelete) {
-    $.get("../components/line.html", function(lineResponse) {
-        // Get line object
-        let lineObj = $(lineResponse);
-        lineObj = setupLineObj(lineObj, onclickDelete);
-        $("#lines-list").append(lineObj)
-    });
-}
-
-function loadDialoguePane(onclickFunction, lines, onclickDelete) {
-    // Remove lines if dialogue is already loaded
-    let lineList = $("#lines-list");
-    if (lineList.length) {
-        lineList.empty();
-
-        for (let i = 0; i < lines.length; i++) {
-            loadLine(lines[i], lineList, onclickDelete);
-        }
-        return;
-    }
-
-    $.get("../components/dialogue.html", function (dialogueResponse) {
-        // Get dialogue object
-        let dialogueObj = $(dialogueResponse);
-
-        // Update new line button to target function
-        dialogueObj.find("#add-new-line").attr("onclick", onclickFunction);
-
-        // Append dialogue to location
-        $("#dialogue").append(dialogueObj);
-
-
-
-        // Update dialogue with lines
-        for (let i = 0; i < lines.length; i++) {
-            loadLine(lines[i], lineList, onclickDelete)
-        }
-    });
-}
-
-function loadLine(line, lineList, onclickDelete) {
-    $.get("../components/line.html").done(function(lineResponse) {
-        // Get line object
-        let lineObj = $(lineResponse);
-
-        for (let i = 0; i < lineList.length; i++) {
-            let currentLine = lineObj.clone();
-
-            // Setup input
-            currentLine = setupLineObj(lineObj, onclickDelete);
-
-            // Handle data
-            currentLine.find("#actor").val(line.actor);
-            currentLine.find("#custom-channel").val(line.targetChannel);
-            currentLine.find("#sticker").val(line.sticker);
-            currentLine.find("#reaction").val(line.reaction);
-            currentLine.find("#type-speed").val(line.typeSpeed);
-            currentLine.find("#read-speed").val(line.readSpeed);
-            currentLine.find("#line").val(line.line);
-
-            lineList.append(currentLine);
-        }
-    })
-}
-
-function setupLineObj(lineObj, onclickDelete) {
-    // Setup input
-    lineObj.find("#type-speed").on("keydown", function(event) {
-        event.preventDefault();
-    });
-
-    lineObj.find("#read-speed").on("keydown", function(event) {
-        event.preventDefault();
-    });
-
-    lineObj.find("#custom-channel").on("keypress", function(event) {
-        if (event.which < 48 || event.which > 58) {
-            event.preventDefault();
-        }
-    });
-
-    lineObj.find("#custom-channel").on("paste", function(event) {
-        if (event.originalEvent.clipboardData.getData("Text").match(/[^\d]/)) {
-            event.preventDefault();
-        }
-    });
-
-    lineObj.find("#delete").attr("onclick", onclickDelete);
-
-    return lineObj;
-}
-
-function addNewLine(lineObj, lineList, data, saveFunction) {
+function addNewLine(lineObj, lineList, data, saveFunction, deleteFunction) {
     // Setup inputs
     lineObj.find("#type-speed").on("keydown", function(event) {
         event.preventDefault();
@@ -176,6 +84,30 @@ function addNewLine(lineObj, lineList, data, saveFunction) {
             saveFunction();
             $(this).trigger("blur");
         }
+    });
+
+    lineObj.find("#delete").on("click", function() {
+        const lineParent = $(this).parent().parent();
+
+        // Check if interaction or conversation
+        if ($("#dialogues").length) {
+            // Handle interaction
+
+            // Retrieve line index
+            let lineIndex = lineParent.parent().children().index(lineParent);
+
+            // Retrieve dialogue index
+            const dialogueList = lineParent.parent().parent().parent().parent();
+            let dialogueIndex = dialogueList.children().index(lineParent.parent().parent().parent());
+
+            deleteFunction({dialogueIndex: dialogueIndex, lineIndex: lineIndex});
+        } else {
+            // Handle conversations
+            deleteFunction({index: lineParent.parent().children().index(lineParent)});
+        }
+
+        lineParent.remove();
+        saveFunction();
     });
 
     // Handle data
