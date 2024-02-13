@@ -3,7 +3,7 @@ let conversations = [];
 
 const conversationTemplate = {
     fileName: "",
-    lines: []
+    dialogue: structuredClone(dialogueTemplate)
 };
 
 const conversationWriterDiv = $("#conversation-writer");
@@ -240,8 +240,8 @@ function loadConversationDialogue() {
     // Load lines into dialogue
     $.get("../components/line.html", function(lineResponse) {
         const lineObj = $(lineResponse);
-        for (let i = 0; i < currentConversation.lines.length; i++) {
-            addNewLine(lineObj.clone(), $("#lines-list"), currentConversation.lines[i], saveConversations);
+        for (let i = 0; i < currentConversation.dialogue.lines.length; i++) {
+            addNewLine(lineObj.clone(), $("#lines-list"), currentConversation.dialogue.lines[i], saveConversations);
         }
     });
 }
@@ -250,7 +250,7 @@ function instantiateConversationLine() {
     // Create new line object
     $.get("../components/line.html", function(lineResponse) {
         let lineData = structuredClone(lineTemplate);
-        currentConversation.lines.push(lineData);
+        currentConversation.dialogue.lines.push(lineData);
         addNewLine($(lineResponse), $("#lines-list"), lineData, saveConversations);
         saveConversations();
     });
@@ -263,7 +263,7 @@ function forceSaveConversations() {
     // Retrieve data from dialogue
     $("#lines-list").children().each(function() {
         const line = $(this);
-        const lineData = currentConversation.lines[i];
+        const lineData = currentConversation.dialogue.lines[i];
 
         lineData.sticker = line.find("#sticker").val();
         lineData.reaction = line.find("#reaction").val();
