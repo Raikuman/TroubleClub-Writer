@@ -154,7 +154,26 @@ function instantiateConversation(data) {
 
             // Make dialogue sortable
             $("#lines-list").sortable({
-                tolerance: 'pointer'
+                tolerance: 'pointer',
+                start: function(event, ui) {
+                    ui.item.data("start_pos", ui.data.index());
+                },
+                update: function(event, ui) {
+                    const currentDialogue = $(this).parent().parent();
+                    const dialogueIndex = $(currentDialogue.parent()).children().index(currentDialogue);
+                    if (dialogueIndex < 0) {
+                        showToast("Unable to move line, please refresh page to maintain data")
+                        return;
+                    }
+
+                    // Propagate change in line list data
+                    moveLineData(
+                        ui.item.data("start_pos"),
+                        ui.item.index(),
+                        currentInteraction.dialogues[dialogueIndex].lines);
+
+                    saveConversations();
+                }
             });
 
             // Load dialogue data

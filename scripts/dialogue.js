@@ -126,3 +126,14 @@ function addNewLine(lineObj, lineList, data, saveFunction, deleteFunction) {
 
     lineList.append(lineObj);
 }
+
+function moveLineData(initial, target, array) {
+    // Store element to move
+    let initialElement = array[initial];
+
+    // Remove element to move
+    array.splice(initial, 1);
+
+    // Add element to move
+    array.splice(target, 0, initialElement);
+}
