@@ -1,5 +1,5 @@
 let currentInteraction = null;
-let interaction = [];
+let interactions = [];
 
 const interactionTemplate = {
     fileName: "",
@@ -16,18 +16,18 @@ loadInteractionData();
 function loadInteractionData() {
     $("#file-picker").load("../components/filePicker.html", function() {
         // Load interaction into array
-        interaction = JSON.parse(localStorage.getItem("interactions"));
+        interactions = JSON.parse(localStorage.getItem("interactions"));
 
         // If interaction could not be parsed, use an empty array
-        if (interaction === null) {
-            interaction = [];
+        if (interactions === null) {
+            interactions = [];
         }
 
         // Load file.html component and populate the file list
         $.get("../components/file.html").done(function(fileResponse) {
             const fileObj = $(fileResponse);
-            for (let i = 0; i < interaction.length; i++) {
-                addFile(fileObj.clone(), loadInteractionFromFile, interaction[i].fileName);
+            for (let i = 0; i < interactions.length; i++) {
+                addFile(fileObj.clone(), loadInteractionFromFile, interactions[i].fileName);
             }
         });
     });
@@ -51,7 +51,7 @@ function addNewFile() {
 
         // Handle state
         currentInteraction = newInteraction;
-        interaction.push(currentInteraction);
+        interactions.push(currentInteraction);
 
         // Instantiate interaction if not existing
         instantiateInteraction(currentInteraction);
@@ -68,9 +68,9 @@ function loadInteractionFromFile() {
 
     // Get interaction from array using file name
     let foundInteraction = null;
-    for (let i = 0; i < interaction.length; i++) {
-        if (interaction[i].fileName === value) {
-            foundInteraction = interaction[i];
+    for (let i = 0; i < interactions.length; i++) {
+        if (interactions[i].fileName === value) {
+            foundInteraction = interactions[i];
             break;
         }
     }
@@ -95,9 +95,9 @@ function deleteInteraction() {
     }
 
     // Remove current interaction from data
-    const index = interaction.indexOf(currentInteraction);
+    const index = interactions.indexOf(currentInteraction);
     if (index > -1) {
-        interaction.splice(index, 1);
+        interactions.splice(index, 1);
         saveInteractions();
     } else {
         showToast("Unable to delete interaction")
@@ -129,7 +129,7 @@ function deleteInteractionLine(dataObj) {
 
 function saveInteractions() {
     // Stringify interaction & update local storage
-    localStorage.setItem("interaction", JSON.stringify(interaction));
+    localStorage.setItem("interactions", JSON.stringify(interactions));
 
     showToast("Saved interaction");
 }
@@ -176,10 +176,10 @@ function loadInteractionSettings(settingObj) {
 
         if (!input.val()) {
             // Set default file name
-            let finalName = "File-" + (interaction.indexOf(currentInteraction) + 1);
+            let finalName = "File-" + (interactions.indexOf(currentInteraction) + 1);
 
             input.val(finalName);
-            fileChildren.eq(interaction.indexOf(currentInteraction) + 1).find("#file-name").text(finalName);
+            fileChildren.eq(interactions.indexOf(currentInteraction) + 1).find("#file-name").text(finalName);
         }
 
         currentInteraction.fileName = input.val();
@@ -191,10 +191,10 @@ function loadInteractionSettings(settingObj) {
         if (event.which === 13) {
             if (!input.val()) {
                 // Set default file name
-                let finalName = "File-" + (interaction.indexOf(currentInteraction) + 1);
+                let finalName = "File-" + (interactions.indexOf(currentInteraction) + 1);
 
                 input.val(finalName);
-                fileChildren.eq(interaction.indexOf(currentInteraction) + 1).find("#file-name").text(finalName);
+                fileChildren.eq(interactions.indexOf(currentInteraction) + 1).find("#file-name").text(finalName);
             }
 
             input.trigger("blur");
@@ -210,7 +210,7 @@ function loadInteractionSettings(settingObj) {
         input.val(finalName);
 
         // Update file obj
-        const fileObj = fileChildren.eq(interaction.indexOf(currentInteraction) + 1);
+        const fileObj = fileChildren.eq(interactions.indexOf(currentInteraction) + 1);
         if (!inputText) {
             fileObj.find("#file-name").text(" ");
         } else {
@@ -261,7 +261,7 @@ function loadInteractionSettingsData(settingObj, data) {
     const input = settingObj.find("#file-name");
 
     // Get file object
-    const fileObj = $("#files").children().eq(interaction.indexOf(currentInteraction) + 1);
+    const fileObj = $("#files").children().eq(interactions.indexOf(currentInteraction) + 1);
 
     // Update file name
     input.val(currentInteraction.fileName);
@@ -454,7 +454,7 @@ function downloadAllFiles() {
         return;
     }
 
-    for (let i = 0; i < interaction.length; i++) {
-        downloadInteraction(interaction[i]);
+    for (let i = 0; i < interactions.length; i++) {
+        downloadInteraction(interactions[i]);
     }
 }
