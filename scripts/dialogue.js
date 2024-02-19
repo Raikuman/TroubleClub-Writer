@@ -5,7 +5,8 @@ const lineTemplate = {
     reaction: "",
     typeSpeed: 1.0,
     readSpeed: 1.0,
-    line: ""
+    line: "",
+    isCommand: false
 };
 
 const dialogueTemplate = {
@@ -13,7 +14,7 @@ const dialogueTemplate = {
     lines: []
 }
 
-function addNewLine(lineObj, lineList, data, saveFunction, deleteFunction) {
+function addNewLine(lineObj, lineList, data, saveFunction, deleteFunction, disableCommand) {
     // Setup inputs
     lineObj.find("#type-speed").on("keydown", function(event) {
         event.preventDefault();
@@ -28,6 +29,15 @@ function addNewLine(lineObj, lineList, data, saveFunction, deleteFunction) {
         data.readSpeed = $(this).val();
         saveFunction();
     });
+
+    if (disableCommand) {
+        lineObj.find("#command-selector").remove();
+    } else {
+        lineObj.find("#command").on("change", function() {
+            data.isCommand = this.checked;
+            saveFunction();
+        });
+    }
 
     lineObj.find("#custom-channel").on("keypress", function(event) {
         if (event.which === 13) {

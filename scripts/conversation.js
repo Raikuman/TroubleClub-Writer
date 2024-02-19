@@ -263,7 +263,7 @@ function loadConversationDialogue() {
     $.get("../components/line.html", function(lineResponse) {
         const lineObj = $(lineResponse);
         for (let i = 0; i < currentConversation.dialogue.lines.length; i++) {
-            addNewLine(lineObj.clone(), $("#lines-list"), currentConversation.dialogue.lines[i], saveConversations, deleteConversationLine);
+            addNewLine(lineObj.clone(), $("#lines-list"), currentConversation.dialogue.lines[i], saveConversations, deleteConversationLine, true);
         }
     });
 }
@@ -273,7 +273,7 @@ function instantiateConversationLine() {
     $.get("../components/line.html", function(lineResponse) {
         let lineData = structuredClone(lineTemplate);
         currentConversation.dialogue.lines.push(lineData);
-        addNewLine($(lineResponse), $("#lines-list"), lineData, saveConversations, deleteConversationLine);
+        addNewLine($(lineResponse), $("#lines-list"), lineData, saveConversations, deleteConversationLine, true);
         saveConversations();
     });
 }
@@ -294,6 +294,7 @@ function forceSaveConversations() {
         lineData.typeSpeed = line.find("#type-speed").val();
         lineData.readSpeed = line.find("#read-speed").val();
         lineData.line = line.find("#line").val();
+        lineData.isCommand = line.find("#command").val();
     });
 
     saveConversations();

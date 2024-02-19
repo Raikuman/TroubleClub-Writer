@@ -376,7 +376,7 @@ function instantiateInteractionDialogue(data) {
 
                 const lineObj = $(lineResponse);
                 for (let i = 0; i < dialogueData.lines.length; i++) {
-                    addNewLine(lineObj.clone(), dialogueObj.find("#lines-list"), dialogueData.lines[i], saveInteractions, deleteInteractionLine);
+                    addNewLine(lineObj.clone(), dialogueObj.find("#lines-list"), dialogueData.lines[i], saveInteractions, deleteInteractionLine, false);
                 }
             });
         })
@@ -414,7 +414,7 @@ function instantiateInteractionLine() {
     $.get("../components/line.html", function(lineResponse) {
         let lineData = structuredClone(lineTemplate);
         currentInteraction.dialogues[dialogueIndex].lines.push(lineData);
-        addNewLine($(lineResponse), currentDialogue.find("#lines-list"), lineData, saveInteractions, deleteInteractionLine);
+        addNewLine($(lineResponse), currentDialogue.find("#lines-list"), lineData, saveInteractions, deleteInteractionLine, false);
 
         saveInteractions();
     });
@@ -447,6 +447,7 @@ function forceSaveInteractions() {
             lineData.typeSpeed = line.find("#type-speed").val();
             lineData.readSpeed = line.find("#read-speed").val();
             lineData.line = line.find("#line").val();
+            lineData.isCommand = line.find("#command").val();
         });
     });
 
