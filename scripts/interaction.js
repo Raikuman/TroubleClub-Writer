@@ -447,7 +447,7 @@ function forceSaveInteractions() {
             lineData.typeSpeed = line.find("#type-speed").val();
             lineData.readSpeed = line.find("#read-speed").val();
             lineData.line = line.find("#line").val();
-            lineData.isCommand = line.find("#command").val();
+            lineData.isCommand = line.find("#command").is(":checked");
         });
     });
 
